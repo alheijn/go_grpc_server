@@ -15,10 +15,10 @@ COPY . .
 # Note: This requires protoc to be installed in the build image.
 # A simpler approach is to have the generated files checked into source control.
 # If you don't have protoc, generate the files locally and comment out this RUN command.
-RUN apk add --no-cache protobuf-dev
-RUN protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    ecommerce/ordermanagement/ordermanagement.proto
+#RUN apk add --no-cache protobuf-dev
+#RUN protoc --go_out=. --go_opt=paths=source_relative \
+#    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+#    ecommerce/ordermanagement/ordermanagement.proto
 
 # Build the Go application, creating a statically linked binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/server .
