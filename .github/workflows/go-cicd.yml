@@ -1,0 +1,36 @@
+# .github/workflows/go-cicd.yml
+
+name: CI/CD - Go gRPC Server
+
+# Controls when the action will run.
+# - on pushes to the main branch
+# - allows manual triggering from the Actions tab
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'go-grpc-server/**' # Only run if Go code changes
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checks-out your repository under $GITHUB_WORKSPACE
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # 2. Logs in to Docker Hub using the secrets
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Builds the Docker image from the Dockerfile and pushes it to Docker Hub
+      - name: Build and push Go image
+        uses: docker/build-push-action@v5
+        with:
+          context: . # Path to the Go app's Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/go-grpc-server:latest # Example: yourusername/go-grpc-server:latest
