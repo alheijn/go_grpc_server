@@ -23,20 +23,32 @@ type server struct {
 }
 
 // CreateOrder implements the CreateOrder RPC method.
+// In main.go
+
 func (s *server) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.Order, error) {
 	log.Printf("Received order creation request for customer: %s", req.CustomerId)
 
-	// --- Simple Data Manipulation ---
-	// 1. Generate a unique order ID.
 	orderID := uuid.New().String()
-
-	// 2. Calculate the total price.
 	var totalPrice float64
 	for _, item := range req.Items {
 		totalPrice += item.PricePerUnit * float64(item.Quantity)
 	}
 
-	// 3. Create the Order object to be returned.
+	// --- Create a sample shipment history ---
+	currentTime := time.Now()
+	shipmentHistory := []*pb.ShipmentEvent{
+		{
+			Description:    "Order created.",
+			Location:       "Warehouse A",
+			EventTimestamp: currentTime.Unix(),
+		},
+		{
+			Description:    "Order is being processed.",
+			Location:       "Warehouse A",
+			EventTimestamp: currentTime.Add(1 * time.Minute).Unix(),
+		},
+	}
+
 	newOrder := &pb.Order{
 		OrderId:            orderID,
 		CustomerId:         req.CustomerId,
@@ -44,7 +56,8 @@ func (s *server) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*
 		ShippingAddress:    req.GetShippingAddress(),
 		TotalPrice:         totalPrice,
 		Status:             pb.Status_PENDING,
-		CreatedAtTimestamp: time.Now().Unix(),
+		CreatedAtTimestamp: currentTime.Unix(),
+		ShipmentHistory:    shipmentHistory,
 	}
 
 	log.Printf("Order created successfully with ID: %s and Total Price: %.2f", newOrder.OrderId, newOrder.TotalPrice)
