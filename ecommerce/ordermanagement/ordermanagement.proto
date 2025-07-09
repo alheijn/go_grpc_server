@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package ecommerce;
+
+option go_package = "ecommerce/ordermanagement";
+option java_package = "com.ecommerce.ordermanagement";
+option java_multiple_files = true;
+
+// The OrderManagement service definition.
+service OrderManagement {
+  // Creates a new order
+  rpc CreateOrder(CreateOrderRequest) returns (Order) {}
+}
+
+// Enum for the order status
+enum Status {
+  PENDING = 0;
+  PROCESSING = 1;
+  SHIPPED = 2;
+  DELIVERED = 3;
+  CANCELLED = 4;
+}
+
+// Represents a single item within an order
+message OrderItem {
+  string product_id = 1;
+  int32 quantity = 2;
+  double price_per_unit = 3;
+}
+
+// Represents a shipping address
+message Address {
+  string street = 1;
+  string city = 2;
+  string state = 3;
+  string zip_code = 4;
+  string country = 5;
+}
+
+// The request message containing the details for creating an order.
+message CreateOrderRequest {
+  string customer_id = 1;
+  repeated OrderItem items = 2;
+  Address shipping_address = 3;
+}
+
+// Represents a complete order. This will be the response.
+message Order {
+  string order_id = 1;
+  string customer_id = 2;
+  repeated OrderItem items = 3;
+  Address shipping_address = 4;
+  double total_price = 5;
+  Status status = 6;
+  int64 created_at_timestamp = 7;
+}
